@@ -1,0 +1,50 @@
+{
+  "n_actas": 76,
+  "n_campos": 3268,
+  "exactitud_campo": 0.5086,
+  "ic95_exactitud": [
+    0.4783,
+    0.5395
+  ],
+  "margen_error_pp": 3.06,
+  "cer_global": 0.482,
+  "ic95_cer": [
+    0.4406,
+    0.526
+  ],
+  "exactitud_por_acta": {
+    "media": 0.5086,
+    "sd": 0.1358,
+    "min": 0.1395,
+    "max": 0.7674
+  },
+  "actas_perfectas": 0,
+  "n_bootstrap": 10000,
+  "cobertura_departamentos": 23,
+  "distribucion_departamental": {
+    "10": 3,
+    "11": 5,
+    "12": 1,
+    "13": 1,
+    "14": 36,
+    "15": 5,
+    "16": 1,
+    "17": 1,
+    "18": 1,
+    "19": 7,
+    "20": 7,
+    "21": 6,
+    "24": 2,
+    "25": 3,
+    "30": 2,
+    "40": 1,
+    "50": 2,
+    "60": 5,
+    "61": 1,
+    "70": 7,
+    "80": 1,
+    "92": 1,
+    "94": 1
+  },
+  "seed_muestra": 2026
+}

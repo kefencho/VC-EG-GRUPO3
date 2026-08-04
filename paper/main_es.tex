@@ -1,0 +1,437 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{cite}
+
+% Versión en ESPAÑOL del paper (la versión canónica WVC es main.tex, en inglés:
+% WVC exige título y abstract en inglés y cuerpo en inglés o portugués).
+% Esta versión es para uso del curso y del grupo.
+
+\begin{document}
+
+% Logo a la IZQUIERDA del título, en una fila (columna m{} = centrado vertical)
+\title{\begin{tabular}{@{}m{2.3cm}@{\hspace{0.3cm}}m{\dimexpr\textwidth-3.0cm\relax}@{}}
+\includegraphics[width=2.1cm]{figuras/logo_uni.png} &
+\centering\arraybackslash Extracci\'on Autom\'atica de Resultados Electorales
+a partir de las Actas de Escrutinio de las Elecciones Generales del Per\'u 2026
+\end{tabular}}
+
+\author{
+\IEEEauthorblockN{Josemanuel Rossy Ca\~nari Palante, Kenny Asto Hinostroza,
+Melissa Dessire Aylas Barranca, Carlos P\'erez P\'erez}
+\IEEEauthorblockA{Maestr\'ia en Inteligencia Artificial --- Visi\'on por Computador, Grupo 3\\
+Universidad Nacional de Ingenier\'ia, Lima, Per\'u}
+}
+
+\maketitle
+
+\begin{abstract}
+Los resultados electorales oficiales del Per\'u se publican como actas de
+escrutinio escaneadas, lo que impide su procesamiento autom\'atico a gran
+escala. Presentamos un pipeline de extremo a extremo que descarga las actas
+del portal oficial de la ONPE, localiza 46 campos por documento mediante una
+plantilla fija anclada por registro de marcas fiduciales, y lee los conteos
+manuscritos con OCR restringido a d\'igitos. La evaluaci\'on no necesita
+anotaci\'on manual: la verdad de terreno proviene de los resultados
+oficialmente digitados que publica el mismo portal, y el conjunto de prueba
+es una muestra aleatoria nacional con semilla publicada (100 actas, 23
+departamentos). La poblaci\'on de actas es heterog\'enea: el 24\% son
+documentos nacidos digitales cuya capa de texto rinde 95.1\% de exactitud por
+campo sin visi\'on alguna. Sobre las 76 actas manuscritas escaneadas (3,268
+campos), el pipeline alcanza 59.6\% de exactitud por campo (IC 95\% [56.6,
+62.5]) y CER de 0.401, frente a 48.4\% de un LLM multimodal de extremo a
+extremo con few-shot, cuantificando el techo del reconocimiento gen\'erico y
+motivando reconocedores afinados con los ${\sim}43$ pares campo--valor que
+cada acta provee gratuitamente.
+\end{abstract}
+
+\begin{IEEEkeywords}
+an\'alisis de documentos, reconocimiento \'optico de caracteres,
+reconocimiento de d\'igitos manuscritos, documentos electorales, registro de
+plantilla
+\end{IEEEkeywords}
+
+\section{Introducci\'on}
+Las actas de escrutinio son la fuente oficial de los resultados electorales
+de cada mesa de sufragio en el Per\'u. Aunque la Oficina Nacional de Procesos
+Electorales (ONPE) publica digitalmente todas las actas, la informaci\'on que
+contienen es visual: un formulario escaneado donde los miembros de mesa
+escribieron los conteos de votos a mano. La extracci\'on manual es lenta,
+propensa a errores y no escala a las ${\sim}88{,}000$ mesas de una elecci\'on
+general, lo que limita la auditor\'ia autom\'atica y la verificaci\'on
+independiente.
+
+Este trabajo plantea una pregunta concreta: \emph{\textquestiondown hasta
+d\'onde puede llegar un pipeline cl\'asico de visi\'on por computadora sobre
+actas peruanas reales muestreadas a escala nacional, y qu\'e implica eso para
+el dise\~no de un sistema de producci\'on?} Construimos y evaluamos un
+pipeline de cinco etapas (adquisici\'on, preprocesamiento, detecci\'on de
+regiones, reconocimiento, salida estructurada) sobre la primera vuelta de las
+Elecciones Generales 2026. Nuestras contribuciones son:
+
+\begin{enumerate}
+\item \textbf{Un protocolo de evaluaci\'on reproducible y sin anotaci\'on
+manual.} El mismo portal que publica la imagen de cada acta publica tambi\'en
+sus conteos oficialmente digitados a trav\'es de una API interna. Usamos esos
+valores como verdad de terreno, lo que convierte cada acta descargada en
+${\sim}43$ pares campo--valor etiquetados a costo cero, y muestreamos el
+conjunto de prueba aleatoriamente a escala nacional con semilla publicada.
+\item \textbf{Detecci\'on por plantilla robustecida con registro fiducial.}
+El acta es un formulario de dise\~no fijo con marcas de registro impresas.
+Mostramos que las plantillas de fracciones fijas se rompen ante el encuadre
+real de los esc\'aneres (bandas negras, desplazamientos) y que un
+emparejamiento de marcas fiduciales por RANSAC de traslaci\'on seguido de una
+transformaci\'on af\'in parcial recupera la alineaci\'on, sumando $+8.7$
+puntos de exactitud.
+\item \textbf{Un hallazgo poblacional con consecuencias de arquitectura.} En
+una muestra aleatoria nacional, el 24\% de las actas son documentos nacidos
+digitales (STAE) cuya capa de texto PDF se puede parsear directamente con
+95.1\% de exactitud por campo; solo el 76\% son formularios manuscritos
+escaneados que requieren visi\'on. Un sistema de producci\'on debe clasificar
+primero el tipo de acta y enrutar en consecuencia.
+\item \textbf{Un techo cuantificado para el OCR gen\'erico.} Sobre actas
+manuscritas, el OCR gen\'erico restringido a d\'igitos con limpieza cuidadosa
+de celdas alcanza 59.6\% de exactitud por campo (IC 95\% [56.6, 62.5],
+bootstrap agrupado). Esto acota lo que puede esperarse sin entrenamiento y
+motiva el ajuste fino de reconocedores transformer con las etiquetas
+gratuitas descritas arriba.
+\item \textbf{Una comparaci\'on cara a cara con un LLM multimodal de extremo
+a extremo.} Bajo un protocolo id\'entico, un LLM multimodal actual con
+few-shot alcanza 48.4\% frente al 60.9\% del pipeline sobre las mismas actas,
+lo que sit\'ua su valor en el arranque sin anotaci\'on y no en la exactitud
+de reconocimiento.
+\end{enumerate}
+
+% Para un envío doble ciego a WVC, comentar la nota al pie siguiente.
+El c\'odigo, los artefactos de evaluaci\'on por campo y la semilla del
+muestreo son p\'ublicos.\footnote{\url{https://github.com/carlosperez100/onpe_actas}}
+
+\section{Trabajos Relacionados}
+\textbf{Detecci\'on en tiempo real.} RT-DETR \cite{rtdetr} mostr\'o que un
+DETR cuidadosamente dise\~nado supera a los detectores YOLO de escala
+comparable (L/X) en exactitud y velocidad, eliminando la supresi\'on de no
+m\'aximos (NMS) y sus umbrales ajustados a mano. Para actas de escrutinio ---
+tablas de celdas contiguas frecuentemente cubiertas por sellos y firmas ---
+la detecci\'on end-to-end sin umbrales es atractiva, y el protocolo de
+latencia end-to-end de RT-DETR es el que adoptaremos para comparar detectores
+aprendidos (YOLOv11 vs.\ RT-DETR) en trabajo futuro. En este art\'iculo la
+detecci\'on se resuelve por registro de plantilla, que a la vez funciona como
+generador autom\'atico de etiquetas para esos detectores.
+
+\textbf{Reconocimiento de texto.} TrOCR \cite{trocr} estableci\'o el OCR
+transformer encoder--decoder con modelos de lenguaje preentrenados, y DTrOCR
+\cite{dtrocr} mostr\'o que una arquitectura generativa solo-decodificador lo
+supera en texto impreso, de escena y manuscrito (CER 2.38 en IAM sin modelo
+de lenguaje externo). Estos resultados justifican los reconocedores
+transformer como la ruta de mejora para nuestros campos de d\'igitos
+manuscritos; una advertencia para nuestro caso es que los priors de lenguaje
+pueden ``corregir'' cadenas de d\'igitos hacia secuencias plausibles, lo que
+importa al leer n\'umeros aislados.
+
+\textbf{An\'alisis unificado de documentos.} OmniParser \cite{omniparser}
+unifica la localizaci\'on de texto, la extracci\'on de informaci\'on clave y
+el reconocimiento de tablas mediante secuencias de puntos estructurados, y
+evidencia la debilidad de la generaci\'on monol\'itica de secuencias: Donut
+\cite{donut} colapsa en tablas largas por acumulaci\'on de error, cayendo a
+22.7 TEDS en PubTabNet frente a 88.83 de OmniParser. Un acta es precisamente
+una tabla larga m\'as campos clave; la localizaci\'on expl\'icita de cada
+valor extra\'ido en OmniParser calza adem\'as con el requisito de
+auditabilidad de los documentos electorales. Mantenemos un pipeline modular
+--- cuyas m\'etricas por etapa son m\'as f\'aciles de diagnosticar --- y
+tratamos el an\'alisis unificado end-to-end como la alternativa contra la
+cual comparar.
+
+Ninguno de estos trabajos eval\'ua d\'igitos manuscritos en espa\~nol sobre
+formularios oficiales con sellos y firmas; esa combinaci\'on es la brecha
+emp\'irica que este proyecto aborda.
+
+\section{Conjunto de Datos}
+\subsection{Fuente y adquisici\'on}
+Todos los documentos provienen del portal oficial de resultados de la ONPE
+para las Elecciones Generales 2026 (primera vuelta, 12 de abril de 2026). El
+portal expone una API interna: buscar una mesa devuelve sus actas y sus
+estados de procesamiento; el detalle del acta lista sus archivos, donde el
+tipo 1 es el acta de escrutinio; una URL firmada de S3 sirve el PDF. Las
+descargas usan impersonaci\'on TLS de navegador, una tasa de solicitudes
+conservadora y un manifiesto reanudable (\texttt{src/scraper/} en nuestro
+repositorio).
+
+\subsection{Dise\~no muestral}
+El universo contiene ${\sim}88{,}064$ c\'odigos de mesa (cota superior
+hallada por b\'usqueda exponencial-binaria contra la API). Extrajimos una
+muestra aleatoria simple sin reemplazo con \textbf{semilla publicada (2026)}:
+100 actas, 100\% de tasa de acierto, cubriendo 23 prefijos departamentales de
+\emph{ubigeo} (el c\'odigo geogr\'afico est\'andar peruano) con una
+distribuci\'on proporcional al tama\~no (Lima concentra el 36\%, consistente
+con su proporci\'on del electorado). Esto corrige el sesgo del piloto de
+c\'odigos secuenciales de un solo distrito.
+
+\subsection{Heterogeneidad de la poblaci\'on}
+Clasificar cada PDF por n\'umero de p\'aginas y capa de texto revela dos
+tipos de documento: \textbf{76 actas manuscritas} (escaneos de una p\'agina,
+capa de texto vac\'ia) y \textbf{24 actas STAE nacidas digitales} (documentos
+de dos p\'aginas firmados digitalmente, con conteos tipografiados y capa de
+texto extra\'ible). La mezcla misma es una estimaci\'on muestral: la
+prevalencia de nacidas digitales es 24\% con intervalo de Wilson al 95\% de
+[16.7, 33.2] --- suficiente para establecer que la poblaci\'on es mixta, no
+para fijar la proporci\'on exacta. Todos los experimentos de visi\'on corren
+sobre las 76 manuscritas; las STAE se procesan por parseo directo de texto
+(Secc.~\ref{sec:stae}).
+
+\subsection{Verdad de terreno}
+Para cada mesa muestreada almacenamos los conteos oficialmente digitados que
+devuelve la API: votos por organizaci\'on pol\'itica (38 filas), votos en
+blanco/nulos/impugnados, totales y electorado. Las posiciones 04 y 14 del
+formulario corresponden a partidos retirados, est\'an vac\'ias en el
+formulario y nulas en la API; se excluyen (un empate nulo-con-nulo inflar\'ia
+espuriamente la exactitud). Esto da \textbf{43 campos evaluables por acta,
+3,268 en total}.
+
+\section{M\'etodo}
+\subsection{Visi\'on general del pipeline}
+(1) \emph{Adquisici\'on}: descarga del PDF m\'as la verdad de terreno
+oficial. (2) \emph{Preprocesamiento}: rasterizaci\'on a 300 DPI,
+enderezamiento por \'angulo dominante, normalizaci\'on de contraste CLAHE,
+eliminaci\'on de ruido non-local means (OpenCV). (3) \emph{Detecci\'on de
+regiones}: plantilla con registro fiducial (abajo). (4)
+\emph{Reconocimiento}: OCR restringido a d\'igitos sobre celdas limpias. (5)
+\emph{Salida estructurada}: un JSON por acta con el esquema de la propuesta.
+
+\subsection{Regiones de plantilla con registro fiducial}
+\label{sec:registro}
+El acta es un formulario de dise\~no fijo, as\'i que 46 regiones (38 celdas
+de votos como filas equiespaciadas, cuatro filas de resumen, n\'umero de
+mesa, electorado, total de ciudadanos, observaciones) se definen una sola vez
+como fracciones de p\'agina calibradas sobre un acta de referencia
+(Fig.~\ref{fig:overlay}). El muestreo nacional expuso el modo de falla de las
+fracciones fijas: el encuadre del esc\'aner var\'ia (bandas negras de margen,
+desplazamientos del contenido de hasta ${\sim}184$ px), corriendo cada celda
+una fila y produciendo CER $>$ 1. El propio formulario trae la soluci\'on:
+cuadrados negros de registro impresos en el borde. Los detectamos como
+componentes conexos oscuros, cuadrados y de alto relleno dentro de las bandas
+del borde; emparejamos las marcas detectadas con 15 posiciones de referencia
+calibradas mediante RANSAC de traslaci\'on (cada par detectada--referencia
+propone un desplazamiento y gana el que deja m\'as inliers), robusto a marcas
+faltantes y a falsos positivos como los d\'igitos de muestra impresos; y
+estimamos una transformaci\'on af\'in parcial que lleva la p\'agina al marco
+de referencia antes de recortar.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figuras/plantilla_overlay.png}
+\caption{Acta de referencia con las 46 regiones de la plantilla: 38 celdas de
+votos (azul), campos de resumen y encabezado (rojo). Las coordenadas de las
+regiones son fracciones de p\'agina, aplicadas tras el registro fiducial.}
+\label{fig:overlay}
+\end{figure}
+
+\subsection{Reconocimiento de conteos manuscritos}
+Las celdas se leen con EasyOCR restringido a un vocabulario de d\'igitos,
+tras una cascada de limpieza motivada por el an\'alisis de errores de un
+piloto de 10 actas (Fig.~\ref{fig:limpieza}): (i) un margen interior elimina
+los bordes impresos de la celda, que antes se le\'ian como d\'igitos extra;
+(ii) la binarizaci\'on de Otsu por celda a\'isla la tinta del lapicero y
+sobrevive a las filas sombreadas alternas del formulario; (iii) los
+separadores punteados internos de la celda --- tan oscuros como la tinta y
+por ello inmunes al umbral --- se borran \emph{por posici\'on de plantilla}
+(fracciones fijas del ancho de la celda); (iv) un filtro de motas por
+componentes conexos elimina el ruido de digitalizaci\'on; (v) los campos con
+casillas impresas por d\'igito (total de ciudadanos) se leen casilla por
+casilla. Un respaldo relee el recorte crudo cuando la limpieza vac\'ia trazos
+tenues.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figuras/limpieza_celdas.png}
+\caption{Aislamiento de tinta en celdas problem\'aticas (arriba: recorte;
+abajo: limpio). Los separadores punteados y bordes impresos --- antes le\'idos
+como d\'igitos (p.~ej.\ 18 le\'ido como 418) --- se eliminan por umbral,
+borrado por posici\'on de plantilla y filtrado de motas.}
+\label{fig:limpieza}
+\end{figure}
+
+\subsection{Regla de dominio: celda vac\'ia significa cero}
+Los miembros de mesa frecuentemente dejan la celda en blanco cuando un
+partido no recibe votos. Una celda en blanco no es una falla del OCR sino
+sem\'antica del formulario, as\'i que una regla de post-procesamiento mapea a
+cero las celdas de partido sin lectura (y los votos impugnados). La
+reportamos por separado para no acreditarle a la visi\'on un conocimiento de
+dominio.
+
+\subsection{Enrutamiento de actas nacidas digitales}
+\label{sec:stae}
+Las actas STAE se parsean directamente de la capa de texto del PDF: cada
+nombre de partido va seguido de su conteo tipografiado, y las etiquetas de
+resumen preceden a sus valores. Emparejar los nombres extra\'idos con los
+oficiales por igualdad de cadenas normalizadas produce la exactitud por campo
+sin ning\'un procesamiento de imagen.
+
+\section{Experimentos}
+\subsection{M\'etricas y protocolo estad\'istico}
+\textbf{Exactitud por campo}: coincidencia exacta entre el entero le\'ido y
+el valor oficial. \textbf{CER}: tasa de error por car\'acter entre las
+cadenas de d\'igitos. Los campos de una misma acta comparten escribiente y
+calidad de escaneo, as\'i que el acta es el cl\'uster estad\'istico: los
+intervalos de confianza usan un \textbf{bootstrap agrupado} (10,000
+remuestreos de actas completas). Todos los artefactos de evaluaci\'on
+(errores por campo, m\'etricas por acta) acompa\~nan al repositorio.
+
+\subsection{Ablaci\'on del piloto (10 actas, 430 campos)}
+El piloto --- mesas secuenciales de un solo distrito, por tanto sesgado pero
+\'util para el an\'alisis de componentes --- cuantifica cada mejora del
+reconocimiento (Tabla~\ref{tab:pilot}).
+
+\begin{table}[t]
+\caption{Ablaci\'on del piloto sobre 10 actas (430 campos).}
+\label{tab:pilot}
+\centering
+\begin{tabular}{lrr}
+\toprule
+Configuraci\'on & Exact. (\%) & CER \\
+\midrule
+v1: OCR de d\'igitos crudo & 43.95 & 0.524 \\
+v2: + tinta, bordes, sub-casillas & 52.09 & 0.419 \\
+v3: + separadores, Otsu, motas & 52.79 & 0.476 \\
+v4: + regla celda-vac\'ia-es-cero & 58.37 & 0.420 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Evaluaci\'on nacional (76 actas manuscritas, 3,268 campos)}
+La Tabla~\ref{tab:national} muestra el mismo sistema sobre la muestra
+aleatoria nacional. El registro fiducial (Secc.~\ref{sec:registro}) es
+decisivo: sin \'el, la variaci\'on de encuadre degrada severamente parte de
+la muestra (peor acta 14\%, CER $>$ 1). El registro suma $+8.7$ puntos y
+eleva la peor acta de 14\% a 30\%; la regla de dominio suma $+21.6$ puntos
+--- a escala nacional, las celdas de cero en blanco son mucho m\'as comunes
+que en el distrito del piloto.
+
+\begin{table}[t]
+\caption{Muestra aleatoria nacional, 76 actas manuscritas (3,268 campos).}
+\label{tab:national}
+\centering
+\begin{tabular}{lrr}
+\toprule
+Configuraci\'on & Exact. (\%) & CER \\
+\midrule
+Plantilla fija, OCR crudo & 26.81 & 0.724 \\
+Plantilla fija + regla cero & 50.86 & 0.482 \\
+Registrada (v5), OCR crudo & 38.00 & 0.617 \\
+\textbf{Registrada (v5) + regla cero} & \textbf{59.58} & \textbf{0.401} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Resultado principal.} Exactitud por campo \textbf{59.58\%, IC 95\%
+[56.61, 62.48]} ($\pm 2.94$ puntos); CER \textbf{0.401, IC 95\% [0.360,
+0.444]}. La exactitud por acta promedia 59.6\% (DE 13.0, rango 30--84\%): la
+varianza residual proviene de la caligraf\'ia y la calidad de
+digitalizaci\'on, ya no de la alineaci\'on. La cifra del piloto (58.4\%)
+resulta cercana, pero solo la estimaci\'on nacional tiene un margen de error
+v\'alido y ofrece cobertura nacional.
+
+\textbf{Actas nacidas digitales.} El parseo por capa de texto de las 24 actas
+STAE alcanza \textbf{95.12\%} (955/1,004 campos); los errores restantes
+provienen del emparejamiento de nombres, no de la lectura. Veinticuatro actas
+bastan aqu\'i porque el parseo es determinista: la varianza entre actas est\'a
+por debajo de la binomial (ICC $\approx 0$, efecto de dise\~no 1.0), de modo
+que el intervalo bootstrap agrupado es [94.5, 95.7], nueve veces m\'as
+estrecho que el de las manuscritas, cuyo efecto de dise\~no es 3.07 para un
+n\'umero comparable de campos. La brecha de 35.5 puntos (IC 95\% [32.6,
+38.5]) cuantifica el valor de enrutar por tipo de documento.
+
+\subsection{L\'inea base con LLM multimodal de extremo a extremo}
+\label{sec:llm}
+Una alternativa natural al pipeline modular es entregar la p\'agina completa
+a un LLM multimodal junto con unos pocos ejemplos resueltos, para que
+localice y lea en un solo paso. Evaluamos esa l\'inea base\footnote{Gemini
+2.5 Flash, capa gratuita, accedido en julio de 2026. C\'odigo:
+\texttt{src/recognition/llm\_ocr.py}.}: el modelo recibe la imagen completa
+del acta m\'as dos ejemplos imagen--JSON y debe devolver el JSON de conteos,
+sin plantilla, sin registro y sin motor OCR. Ambos sistemas se puntean sobre
+las mismas 15 actas manuscritas (645 campos) con el mismo protocolo
+(Tabla~\ref{tab:llm}).
+
+\begin{table}[t]
+\caption{Pipeline modular vs.\ LLM few-shot de extremo a extremo sobre las
+mismas 15 actas manuscritas (645 campos).}
+\label{tab:llm}
+\centering
+\begin{tabular}{lrr}
+\toprule
+M\'etodo & Exact. (\%) & CER \\
+\midrule
+\textbf{Pipeline (plantilla registrada + OCR)} & \textbf{60.93} & \textbf{0.395} \\
+LLM few-shot, extremo a extremo (2 ejemplos) & 48.37 & 0.591 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El pipeline gana por 12.6 puntos. El LLM interpreta bien la estructura del
+formulario, pero no est\'a entrenado para d\'igitos manuscritos peruanos y se
+degrada m\'as r\'apido en escaneos de baja calidad: en las dos peores actas
+cae a 20.9\% y 23.3\% donde el pipeline a\'un lee 34.9\% y 53.5\%, porque el
+recorte le entrega al reconocedor una celda aislada mientras que el LLM debe
+lidiar con el ruido circundante. Esto es coherente con DTrOCR \cite{dtrocr}:
+el reconocimiento fuerte de manuscrito proviene del entrenamiento
+espec\'ifico, no de la capacidad general. Su ventaja es ortogonal a la
+exactitud --- no requiri\'o ingenier\'ia de detecci\'on alguna, mientras que
+el pipeline necesit\'o calibrar la plantilla y el registro fiducial ---, lo
+que lo vuelve \'util como anotador inicial para un formato nuevo y como
+pre-etiquetador cuya salida un humano corrige, no como reemplazo de un
+reconocedor especializado.
+
+\subsection{An\'alisis de errores}
+Los errores restantes se concentran en: d\'igitos delgados aislados que la
+etapa de detecci\'on del motor OCR no encuentra; trazos que invaden las
+franjas borradas de los separadores; confusiones de forma (8 vs.\ 18, 7 vs.\
+9) en caligraf\'ias anchas; y campos de casillas m\'ultiples. Son errores de
+reconocimiento, no de localizaci\'on --- exactamente el componente que el
+ajuste fino reemplaza.
+
+\section{Conclusiones y Trabajo Futuro}
+Un pipeline cl\'asico sobre actas peruanas reales muestreadas nacionalmente
+alcanza 59.6\% de exactitud por campo (IC 95\% [56.6, 62.5]) en documentos
+manuscritos y 95.1\% en los nacidos digitales, con un protocolo de
+evaluaci\'on que no necesita anotaci\'on manual. Destacan tres lecciones de
+dise\~no: registrar las plantillas sobre las marcas fiduciales del formulario
+antes de cualquier recorte por coordenadas fijas; separar la sem\'antica de
+dominio (blanco $=$ 0) del desempe\~no de visi\'on; y clasificar el tipo de
+documento antes de elegir la ruta de procesamiento. Una cuarta lecci\'on
+viene de la l\'inea base con LLM: promptear un modelo multimodal general de
+extremo a extremo es m\'as barato de construir pero 12.6 puntos menos exacto
+(48.4\%), de modo que en esta tarea la generalidad a\'un no sustituye a la
+especializaci\'on. El techo cuantificado del
+OCR gen\'erico motiva los siguientes pasos: ajustar finamente un reconocedor
+transformer \cite{trocr,dtrocr} con los pares campo--valor gratuitos
+(${\sim}43$ por acta, ${\sim}43{,}000$ con 1,000 actas), entrenar detectores
+aprendidos (YOLOv11, RT-DETR \cite{rtdetr}) con etiquetas autogeneradas por
+la plantilla registrada, comparar el pipeline modular contra analizadores
+unificados \cite{omniparser,donut}, y usar el LLM como pre-etiquetador en el
+ciclo de correcci\'on humana que produce el conjunto de ajuste fino.
+
+\begin{thebibliography}{9}
+\bibitem{rtdetr} Y.~Zhao, W.~Lv, S.~Xu, J.~Wei, G.~Wang, Q.~Dang, Y.~Liu,
+and J.~Chen, ``DETRs beat YOLOs on real-time object detection,'' in
+\emph{Proc. IEEE/CVF CVPR}, 2024, pp. 16965--16974.
+\bibitem{dtrocr} M.~Fujitake, ``DTrOCR: Decoder-only transformer for optical
+character recognition,'' in \emph{Proc. IEEE/CVF WACV}, 2024, pp. 8025--8035.
+\bibitem{omniparser} J.~Wan, S.~Song, W.~Yu, Y.~Liu, W.~Cheng, F.~Huang,
+X.~Bai, C.~Yao, and Z.~Yang, ``OmniParser: A unified framework for text
+spotting, key information extraction and table recognition,'' in \emph{Proc.
+IEEE/CVF CVPR}, 2024, pp. 15641--15653.
+\bibitem{trocr} M.~Li, T.~Lv, J.~Chen, L.~Cui, Y.~Lu, D.~Florencio, C.~Zhang,
+Z.~Li, and F.~Wei, ``TrOCR: Transformer-based optical character recognition
+with pre-trained models,'' in \emph{Proc. AAAI}, 2023, pp. 13094--13102.
+\bibitem{donut} G.~Kim, T.~Hong, M.~Yim, J.~Nam, J.~Park, J.~Yim, W.~Hwang,
+S.~Yun, D.~Han, and S.~Park, ``OCR-free document understanding transformer,''
+in \emph{Proc. ECCV}, 2022, pp. 498--517.
+\end{thebibliography}
+
+\end{document}

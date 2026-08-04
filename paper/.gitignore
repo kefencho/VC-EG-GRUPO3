@@ -1,0 +1,5 @@
+*.aux
+*.log
+*.out
+_pass*.log
+_c[0-9]_*.log

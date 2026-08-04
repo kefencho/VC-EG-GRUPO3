@@ -1,0 +1,12 @@
+{
+  "name": "onpe-actas-presentacion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Genera el PPTX de la exposición final (español, 15 min, con notas del expositor)",
+  "scripts": {
+    "build": "node generar_diapositivas.js"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "seed": 2026,
+  "n_bootstrap": 20000,
+  "unidad_de_agrupamiento": "acta",
+  "subconjuntos": {
+    "stae_nacidas_digitales": {
+      "n_actas": 24,
+      "n_campos": 1004,
+      "n_correctos": 955,
+      "exactitud": 0.9512,
+      "ic95_bootstrap_agrupado": [
+        0.9453,
+        0.957
+      ],
+      "semiamplitud_pp": 0.58,
+      "ic95_wilson_sin_agrupar": [
+        0.9361,
+        0.9629
+      ],
+      "icc": 0.0,
+      "campos_por_acta": 41.8,
+      "deff": 1.0,
+      "n_efectivo_campos": 1004,
+      "actas_requeridas": {
+        "+-5pp": {
+          "campos": 71,
+          "actas": 2
+        },
+        "+-3pp": {
+          "campos": 198,
+          "actas": 5
+        },
+        "+-2pp": {
+          "campos": 446,
+          "actas": 11
+        }
+      }
+    },
+    "manuscritas_v5_regla": {
+      "n_actas": 76,
+      "n_campos": 3268,
+      "n_correctos": 1947,
+      "exactitud": 0.5958,
+      "ic95_bootstrap_agrupado": [
+        0.5664,
+        0.6245
+      ],
+      "semiamplitud_pp": 2.91,
+      "ic95_wilson_sin_agrupar": [
+        0.5788,
+        0.6125
+      ],
+      "icc": 0.0492,
+      "campos_por_acta": 43.0,
+      "deff": 3.07,
+      "n_efectivo_campos": 1066,
+      "actas_requeridas": {
+        "+-5pp": {
+          "campos": 1135,
+          "actas": 27
+        },
+        "+-3pp": {
+          "campos": 3153,
+          "actas": 74
+        },
+        "+-2pp": {
+          "campos": 7093,
+          "actas": 165
+        }
+      }
+    }
+  },
+  "contraste_stae_vs_manuscritas": {
+    "brecha_pp": 35.54,
+    "ic95_pp": [
+      32.57,
+      38.52
+    ],
+    "p_valor_bootstrap_h0_menor_igual_0": 0.0
+  }
+}

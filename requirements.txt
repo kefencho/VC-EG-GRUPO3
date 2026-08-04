@@ -1,0 +1,15 @@
+# Dependencias del proyecto onpe_actas
+# --- scraping / descarga ---
+curl_cffi>=0.6.0
+requests>=2.31.0
+pymupdf>=1.23.0
+# --- visión por computadora ---
+opencv-python>=4.9.0
+numpy>=1.24.0
+# --- OCR (elige uno) ---
+easyocr>=1.7.0
+# pytesseract>=0.3.10        # alternativa (requiere binario tesseract)
+# --- utilidades / análisis ---
+pandas>=2.0.0
+matplotlib>=3.7.0
+tqdm>=4.66.0

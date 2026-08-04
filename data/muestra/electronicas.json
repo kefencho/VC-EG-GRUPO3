@@ -1,0 +1,152 @@
+{
+  "n_actas": 24,
+  "exactitud_global": 0.9512,
+  "campos": 1004,
+  "correctos": 955,
+  "actas": [
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "038585"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "039803"
+    },
+    {
+      "campos": 40,
+      "correctos": 40,
+      "exactitud": 1.0,
+      "mesa": "040322"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "041084"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "041505"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "045485"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "046746"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "046826"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "048346"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "052187"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "052685"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "052702"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "053912"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "054007"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "054760"
+    },
+    {
+      "campos": 40,
+      "correctos": 37,
+      "exactitud": 0.925,
+      "mesa": "055131"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "055341"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "056284"
+    },
+    {
+      "campos": 42,
+      "correctos": 38,
+      "exactitud": 0.9048,
+      "mesa": "059959"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "060061"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "061156"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "061995"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "081406"
+    },
+    {
+      "campos": 42,
+      "correctos": 40,
+      "exactitud": 0.9524,
+      "mesa": "081703"
+    }
+  ]
+}

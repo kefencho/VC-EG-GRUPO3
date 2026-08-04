@@ -1,0 +1,289 @@
+% ---------------------------------------------------------------------------
+% Póster del trabajo final — Visión por Computador (Maestría en IA, Grupo 3)
+% Formato: A0 vertical (841 x 1189 mm), en inglés, 2 columnas, UNA sola página.
+% Solo paquetes base de LaTeX (sin tikzposter/beamerposter) para que compile
+% en cualquier instalación: geometry, multicol, xcolor, graphicx, booktabs.
+% Compilar: pdflatex -interaction=nonstopmode poster.tex   (2 pasadas)
+% ---------------------------------------------------------------------------
+\documentclass{article}
+\usepackage[a0paper,portrait,top=2.6cm,bottom=2.2cm,left=2.8cm,right=2.8cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{helvet}
+\usepackage{url}
+\renewcommand{\familydefault}{\sfdefault}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{2.8cm}
+\setlength{\tabcolsep}{8pt}
+\renewcommand{\arraystretch}{1.45}
+
+\definecolor{azul}{HTML}{0F2E52}      % institucional, encabezados
+\definecolor{acento}{HTML}{C8102E}    % rojo: cifra principal
+\definecolor{verde}{HTML}{1B7F5A}     % verde: hallazgo positivo
+\definecolor{gris}{HTML}{EEF1F5}      % fondo de cajas
+\definecolor{grisborde}{HTML}{C6CFDA}
+
+% --- tamaños de letra (A0: lectura cómoda a ~1.5 m) ---
+\newcommand{\cuerpo}{\fontsize{28}{36}\selectfont}
+\newcommand{\chico}{\fontsize{23}{29}\selectfont}
+\newcommand{\seccion}[1]{%
+  \vspace{11mm}%
+  \noindent\colorbox{azul}{\parbox{\dimexpr\columnwidth-2\fboxsep\relax}{%
+    \vspace{1.5mm}\color{white}\bfseries\fontsize{37}{44}\selectfont #1\vspace{1.5mm}}}%
+  \par\vspace{4mm}}
+\newcommand{\caja}[1]{%
+  \vspace{2mm}\noindent\fcolorbox{grisborde}{gris}{%
+    \parbox{\dimexpr\columnwidth-2\fboxsep-2\fboxrule\relax}{\vspace{3mm}#1\vspace{3mm}}}%
+  \par\vspace{2mm}}
+\newcommand{\etapa}[2]{%
+  \colorbox{azul}{\parbox[c][3.1cm][c]{0.157\columnwidth}{\centering\color{white}%
+  \bfseries\fontsize{22}{26}\selectfont #1\\[1pt]{\mdseries\fontsize{16}{19}\selectfont #2}}}}
+\newcommand{\flecha}{\raisebox{1.1cm}{\color{azul}\fontsize{30}{30}\selectfont$\rightarrow$}}
+
+\begin{document}
+\cuerpo
+
+% =========================== ENCABEZADO ===================================
+\noindent
+\begin{minipage}[c]{0.115\textwidth}
+  \includegraphics[width=\linewidth]{figuras/logo_uni.png}
+\end{minipage}%
+\begin{minipage}[c]{0.765\textwidth}
+  \centering
+  {\bfseries\fontsize{68}{80}\selectfont\color{azul}
+  Automatic Extraction of Electoral Results from the\\[4pt]
+  Tally Sheets of the 2026 Peruvian General Elections\par}
+  \vspace{7mm}
+  {\fontsize{29}{36}\selectfont
+  Josemanuel Rossy Ca\~nari Palante \quad$\cdot$\quad Kenny Asto Hinostroza
+  \quad$\cdot$\quad Melissa Dessire Aylas Barranca \quad$\cdot$\quad Carlos P\'erez P\'erez\par}
+  \vspace{4mm}
+  {\fontsize{25}{31}\selectfont\itshape
+  Master's Program in Artificial Intelligence --- Computer Vision, Group 3 ---
+  Universidad Nacional de Ingenier\'ia, Lima, Peru\par}
+\end{minipage}%
+\begin{minipage}[c]{0.115\textwidth}
+  \raggedleft
+  \includegraphics[width=0.78\linewidth]{figuras/qr_repo.png}\\[2pt]
+  {\raggedleft\chico\bfseries\color{azul}code + data\par}
+\end{minipage}
+
+\vspace{6mm}
+{\color{azul}\rule{\textwidth}{5pt}}
+\vspace{4mm}
+
+% ==================== FRANJA DE RESULTADOS CLAVE ==========================
+\noindent
+\fcolorbox{grisborde}{gris}{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
+\vspace{4mm}
+\begin{minipage}[t]{0.315\linewidth}\centering
+  {\bfseries\fontsize{80}{88}\selectfont\color{acento}59.6\%}\\[4pt]
+  {\fontsize{25}{31}\selectfont field accuracy on handwritten actas\\
+  95\% CI [56.6, 62.5] $\cdot$ CER 0.401 $\cdot$ 3{,}268 fields}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.315\linewidth}\centering
+  {\bfseries\fontsize{80}{88}\selectfont\color{verde}95.1\%}\\[4pt]
+  {\fontsize{25}{31}\selectfont on born-digital actas, parsed from the PDF text
+  layer \textbf{with no vision at all}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.315\linewidth}\centering
+  {\bfseries\fontsize{80}{88}\selectfont\color{azul}0}\\[4pt]
+  {\fontsize{25}{31}\selectfont manually annotated fields: ground truth is the
+  official result published by the same portal}
+\end{minipage}
+\vspace{4mm}}}
+
+\vspace{7mm}
+
+% =========================== COLUMNAS ======================================
+\begin{multicols}{2}
+
+\seccion{1. Problem}
+Peru's National Office of Electoral Processes (ONPE) publishes every tally
+sheet (\emph{acta de escrutinio}) digitally, but the information is
+\textbf{visual}: a scanned form where polling-station members wrote the vote
+counts by hand. Manual extraction does not scale to the ${\sim}88{,}000$
+stations of a general election, which limits automatic auditing and
+independent verification. \textbf{Our question:} how far can a classical
+computer vision pipeline go on \emph{real, nationally sampled} actas, and
+what does that imply for a production system?
+
+\seccion{2. Dataset and ground truth}
+\textbf{Source.} Official ONPE portal, 2026 General Elections, first round
+(presidential); actas downloaded through the portal's own API.
+
+\vspace{3mm}
+\textbf{Sampling.} Simple random sample without replacement over the
+${\sim}88{,}064$ stations with a \textbf{published seed (2026)}: 100 actas,
+100\% hit rate, 23 department-level codes, size-proportional (Lima 36\%).
+This removes the bias of the pilot, which used sequential codes from a single
+district.
+
+\vspace{3mm}
+\textbf{Annotation-free ground truth.} The same portal publishes the
+officially digitized counts, so every acta yields ${\sim}43$ labeled
+field--value pairs \textbf{at zero annotation cost} and the evaluation is
+fully reproducible.
+
+\caja{\textbf{Population finding with architectural consequences.} The
+population is \emph{mixed}: \textbf{76 handwritten} scans and \textbf{24
+born-digital (STAE)} documents with an extractable text layer (prevalence
+24\%, 95\% Wilson CI [16.7, 33.2]). A production system must
+\textbf{classify the document type first and route accordingly}.}
+
+\seccion{3. Method}
+\vspace{-1mm}
+\begin{center}
+\etapa{1. Acquire}{API + PDF$\rightarrow$PNG 300 dpi}\,\flecha\,
+\etapa{2. Preprocess}{deskew, CLAHE, denoise}\,\flecha\,
+\etapa{3. Detect}{registered template}\,\flecha\,
+\etapa{4. Recognize}{digit-restricted OCR}\,\flecha\,
+\etapa{5. Structure}{JSON per acta}
+\end{center}
+\vspace{2mm}
+
+\textbf{Detection by fiducial registration.} The acta is a fixed-layout form,
+so 46 regions (38 party rows, 4 summary rows, 4 context fields) are defined
+as page fractions. Real scans break fixed fractions (black bands, offsets),
+so the 15 printed registration squares are detected, matched to a reference
+acta by \textbf{RANSAC on translation}, and corrected with a partial affine
+warp before cropping.
+
+\vspace{3mm}
+\textbf{Recognition.} EasyOCR restricted to digits over cleaned cells:
+interior margin against printed borders, ink isolation by dark threshold and
+Otsu, erasure of the dotted separators by template position, speckle
+filtering.
+
+\vspace{3mm}
+\textbf{Domain rule.} Polling-station members leave a cell \emph{blank}
+instead of writing 0, so an empty cleaned cell is read as \textbf{0 votes} ---
+a semantic decision, not a vision one.
+
+\vspace{4mm}
+\begin{center}
+\includegraphics[height=28cm]{figuras/plantilla_overlay.png}
+\hspace{1.2cm}
+\includegraphics[height=28cm]{figuras/limpieza_celdas.png}\\[2mm]
+{\chico Left: template regions after fiducial registration. Right: cell
+cleaning (raw crop $\rightarrow$ ink isolation $\rightarrow$ separators erased).}
+\end{center}
+
+\columnbreak
+
+\seccion{4. Experimental setup}
+\textbf{Metrics.} \emph{Field accuracy} (exact match against the official
+integer) and \emph{CER} over digit strings.
+
+\vspace{3mm}
+\textbf{Statistics.} Fields inside one acta share writer and scan quality, so
+\textbf{the acta is the cluster}: every interval comes from a
+\textbf{clustered bootstrap} (10,000 resamples of whole actas). Per-field
+binomial intervals would be optimistic --- the measured design effect is
+\textbf{3.07} on handwritten actas (76 actas $\approx$ 1,066 independent
+fields). Ablations are re-evaluated on the saved outputs, with no OCR re-run.
+
+\seccion{5. Results}
+\textbf{National random sample --- 76 handwritten actas, 3,268 fields}
+\vspace{2mm}
+
+{\chico
+\begin{tabular}{@{}p{0.62\columnwidth}rr@{}}
+\toprule
+\textbf{Configuration} & \textbf{Acc.\ (\%)} & \textbf{CER} \\
+\midrule
+Fixed template, raw OCR            & 26.81 & 0.724 \\
+Fixed template + zero rule         & 50.86 & 0.482 \\
+Registered (fiducials), raw OCR    & 38.00 & 0.617 \\
+\textbf{Registered + zero rule}    & \textbf{59.58} & \textbf{0.401} \\
+\bottomrule
+\end{tabular}}
+
+\vspace{4mm}
+Fiducial registration is worth \textbf{+8.7 points} and lifts the worst acta
+from 14\% to 30\%; the domain rule is worth \textbf{+21.6 points}. Per-acta
+accuracy averages 59.6\% (SD 13.0, range 30--84\%): the residual variance is
+handwriting and scan quality, not misalignment.
+
+\vspace{5mm}
+\textbf{Pilot ablation --- 10 actas, 430 fields}
+\vspace{2mm}
+
+{\chico
+\begin{tabular}{@{}p{0.62\columnwidth}rr@{}}
+\toprule
+\textbf{Configuration} & \textbf{Acc.\ (\%)} & \textbf{CER} \\
+\midrule
+v1: raw digit OCR                        & 43.95 & 0.524 \\
+v2: + ink isolation, borders, sub-boxes  & 52.09 & 0.419 \\
+v3: + separator erasure, Otsu, speckle   & 52.79 & 0.476 \\
+v4: + empty-cell-is-zero rule            & 58.37 & 0.420 \\
+\bottomrule
+\end{tabular}}
+
+\vspace{5mm}
+\textbf{Does a multimodal LLM replace the pipeline? No.} Same 15 handwritten
+actas (645 fields), same protocol; the LLM gets the full page plus two
+image--JSON exemplars, with no template and no OCR.
+\vspace{2mm}
+
+{\chico
+\begin{tabular}{@{}p{0.62\columnwidth}rr@{}}
+\toprule
+\textbf{Method} & \textbf{Acc.\ (\%)} & \textbf{CER} \\
+\midrule
+\textbf{Pipeline (registered template + OCR)} & \textbf{60.93} & \textbf{0.395} \\
+LLM few-shot, end-to-end (2 exemplars)        & 48.37 & 0.591 \\
+\bottomrule
+\end{tabular}}
+
+\vspace{4mm}
+The LLM reads the layout well but is not trained for handwritten Peruvian
+digits and collapses on poor scans (20.9\% and 23.3\% on the two worst actas,
+where the pipeline still reads 34.9\% and 53.5\%). Its real advantage is
+\textbf{zero detection engineering}: a bootstrap pre-labeler for a new form,
+not a replacement recognizer.
+
+\caja{\textbf{Is 24 actas enough for the 95.1\%?} Yes --- text parsing is
+deterministic, so between-acta variance falls below binomial (ICC
+$\approx 0$, design effect 1.0) and the interval is [94.5, 95.7], nine times
+tighter than the handwritten one. The 35.5-point gap has a 95\% CI of
+[32.6, 38.5].}
+
+\seccion{6. Conclusions and future work}
+\textbf{1.} Register the template on the form's fiducial marks \emph{before}
+any fixed-coordinate cropping.\\[2mm]
+\textbf{2.} Separate domain semantics (blank $=$ 0) from vision performance;
+conflating them hides where the system really fails.\\[2mm]
+\textbf{3.} Classify the document type first: routing born-digital actas to
+text parsing is worth \textbf{35.5 points}.\\[2mm]
+\textbf{4.} Generality does not yet beat specialization: a general multimodal
+LLM is cheaper to build but 12.6 points less accurate.
+
+\caja{\textbf{Limitations.} 59.6\% is a \emph{ceiling for generic OCR}, not a
+deployable accuracy. Errors now concentrate in \textbf{recognition}, not
+localization --- exactly the component fine-tuning replaces. Next: fine-tune
+TrOCR on the free field--value pairs (${\sim}43{,}000$ from 1,000 actas),
+train YOLOv11 / RT-DETR on labels auto-generated by the registered template,
+and use the LLM as pre-labeler in the human-correction loop.}
+
+\end{multicols}
+
+\vspace{3mm}
+{\color{azul}\rule{\textwidth}{4pt}}
+\vspace{2mm}
+
+\begin{center}
+{\chico Code, per-field evaluation artifacts and the sampling seed:
+\textbf{\url{https://github.com/carlosperez100/onpe_actas}} \quad$\cdot$\quad
+Related work: RT-DETR (CVPR 2024) $\cdot$ DTrOCR (WACV 2024) $\cdot$
+OmniParser (CVPR 2024)}
+\end{center}
+
+\end{document}
