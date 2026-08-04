@@ -10,10 +10,10 @@ análisis y auditoría.
 
 > 🗳️ **Resumen visual del proyecto** (pipeline, resultados con IC 95%,
 > hallazgos y entregables):
-> **https://carlosperez100.github.io/onpe_actas/resumen.html**
+> **https://kefencho.github.io/VC-EG-GRUPO3/resumen.html**
 >
 > 🖼️ **Póster en el navegador** (réplica web del A0, en inglés):
-> **https://carlosperez100.github.io/onpe_actas/poster.html**
+> **https://kefencho.github.io/VC-EG-GRUPO3/poster.html**
 >
 > ▶️ **Correrlo tú mismo sin asistente:** doble clic en `EJECUTAR - EASYOCR.bat`
 > (guía completa en [docs/COMO_CORRERLO.md](docs/COMO_CORRERLO.md)) ·
@@ -26,7 +26,7 @@ análisis y auditoría.
 | Entregable | Dónde está | Cómo se regenera |
 |---|---|---|
 | **Paper** (inglés, formato WVC/IEEE, 5 págs, abstract 148 palabras) | [paper/main.pdf](paper/main.pdf) · versión en español: [paper/main_es.pdf](paper/main_es.pdf) | `cd paper && pdflatex main.tex` (dos pasadas) |
-| **Póster** (inglés, A0 vertical, una página) | PDF: [poster/poster.pdf](poster/poster.pdf) · web: **[carlosperez100.github.io/onpe_actas/poster.html](https://carlosperez100.github.io/onpe_actas/poster.html)** | `cd poster && pdflatex poster.tex` (dos pasadas); la versión web es [docs/poster.html](docs/poster.html) |
+| **Póster** (inglés, A0 vertical, una página) | PDF: [poster/poster.pdf](poster/poster.pdf) · web: **[kefencho.github.io/VC-EG-GRUPO3/poster.html](https://kefencho.github.io/VC-EG-GRUPO3/poster.html)** | `cd poster && pdflatex poster.tex` (dos pasadas); la versión web es [docs/poster.html](docs/poster.html) |
 | **Presentación** (español, 15 min, con notas del expositor) | genera `Presentacion - Grupo 3.pptx` | `cd presentacion && npm install && node generar_diapositivas.js` (acepta una ruta de salida como argumento) |
 | **Implementación** | este repositorio | ver *Reproducir los resultados del paper* |
 
