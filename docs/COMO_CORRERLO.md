@@ -18,15 +18,8 @@ En la raíz del repo está **`EJECUTAR - EASYOCR.bat`**:
 
 ## Opción B — Etapa por etapa (para entender qué hace cada una)
 
-**Regla de oro de esta máquina:** el Python bueno es el de
-`C:\ProgramData\anaconda3`, y SIEMPRE con estas dos variables (sin ellas no
-arranca o revienta con acentos):
+**Regla de oro de esta máquina:** Python deberia estar instalado en la maquina.
 
-```bat
-set PYTHONHOME=C:\ProgramData\anaconda3
-set PYTHONUTF8=1
-set PY=C:\ProgramData\anaconda3\python.exe
-```
 
 Luego, desde la raíz del repo, cada etapa se corre DENTRO de su carpeta
 (los scripts usan rutas relativas a propósito — OpenCV en Windows no abre

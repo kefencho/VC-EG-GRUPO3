@@ -10,10 +10,10 @@ análisis y auditoría.
 
 > 🗳️ **Resumen visual del proyecto** (pipeline, resultados con IC 95%,
 > hallazgos y entregables):
-> **https://kefencho.github.io/VC-EG-GRUPO3/resumen.html**
+> **https://kefencho.github.io/VC-EG-GRUPO3/docs/resumen.html**
 >
-> 🖼️ **Póster en el navegador** (réplica web del A0, en inglés):
-> **https://kefencho.github.io/VC-EG-GRUPO3/poster.html**
+> 🖼️ **Póster en el navegador** (pdf, en español):
+> **https://kefencho.github.io/VC-EG-GRUPO3/poster/Poster_ONPE_2026_Grupo03.pdf**
 >
 > ▶️ **Correrlo tú mismo sin asistente:** doble clic en `EJECUTAR - EASYOCR.bat`
 > (guía completa en [docs/COMO_CORRERLO.md](docs/COMO_CORRERLO.md)) ·
@@ -26,13 +26,8 @@ análisis y auditoría.
 | Entregable | Dónde está | Cómo se regenera |
 |---|---|---|
 | **Paper** (inglés, formato WVC/IEEE, 5 págs, abstract 148 palabras) | [paper/main.pdf](paper/main.pdf) · versión en español: [paper/main_es.pdf](paper/main_es.pdf) | `cd paper && pdflatex main.tex` (dos pasadas) |
-| **Póster** (inglés, A0 vertical, una página) | PDF: [poster/poster.pdf](poster/poster.pdf) · web: **[kefencho.github.io/VC-EG-GRUPO3/poster.html](https://kefencho.github.io/VC-EG-GRUPO3/poster.html)** | `cd poster && pdflatex poster.tex` (dos pasadas); la versión web es [docs/poster.html](docs/poster.html) |
-| **Presentación** (español, 15 min, con notas del expositor) | genera `Presentacion - Grupo 3.pptx` | `cd presentacion && npm install && node generar_diapositivas.js` (acepta una ruta de salida como argumento) |
+| **Póster** (inglés, A0 vertical, una página) | PDF: [poster/poster.pdf](poster/poster.pdf) · web: **[kefencho.github.io/VC-EG-GRUPO3/poster/Poster_ONPE_2026_Grupo03.pdf](https://kefencho.github.io/VC-EG-GRUPO3/poster/Poster_ONPE_2026_Grupo03.pdf)** | `cd poster && pdflatex main.tex`; la versión pdf es [poster/Poster_ONPE_2026_Grupo03.pdf](poster/Poster_ONPE_2026_Grupo03.pdfs) |
 | **Implementación** | este repositorio | ver *Reproducir los resultados del paper* |
-
-El paper también se abre en **Overleaf gratis con un clic**:
-[abrir proyecto](https://www.overleaf.com/docs?snip_uri=https://raw.githubusercontent.com/carlosperez100/onpe_actas/main/paper/overleaf.zip)
-(para la versión en español: Menu → Settings → Main document → `main_es.tex`).
 
 ---
 
