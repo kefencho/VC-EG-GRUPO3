@@ -1,0 +1,123 @@
+{
+  "actas": [
+    {
+      "campos_evaluados": 45,
+      "campos_correctos": 25,
+      "exactitud_campo": 0.5556,
+      "cer_promedio": 0.3756,
+      "acta_perfecta": false,
+      "errores": [
+        {
+          "campo": "partido_03",
+          "oficial": 15,
+          "leido": 1
+        },
+        {
+          "campo": "partido_06",
+          "oficial": 3,
+          "leido": 4
+        },
+        {
+          "campo": "partido_08",
+          "oficial": 1,
+          "leido": 4
+        },
+        {
+          "campo": "partido_10",
+          "oficial": 5,
+          "leido": 0
+        },
+        {
+          "campo": "partido_11",
+          "oficial": 11,
+          "leido": 1
+        },
+        {
+          "campo": "partido_12",
+          "oficial": 2,
+          "leido": 7
+        },
+        {
+          "campo": "partido_17",
+          "oficial": 7,
+          "leido": 1
+        },
+        {
+          "campo": "partido_21",
+          "oficial": 26,
+          "leido": 6
+        },
+        {
+          "campo": "partido_22",
+          "oficial": 0,
+          "leido": 5
+        },
+        {
+          "campo": "partido_24",
+          "oficial": 23,
+          "leido": 130
+        },
+        {
+          "campo": "partido_25",
+          "oficial": 1,
+          "leido": 7
+        },
+        {
+          "campo": "partido_34",
+          "oficial": 2,
+          "leido": 29
+        },
+        {
+          "campo": "partido_36",
+          "oficial": 1,
+          "leido": 4
+        },
+        {
+          "campo": "partido_38",
+          "oficial": 2,
+          "leido": 9
+        },
+        {
+          "campo": "votos_blancos",
+          "oficial": 15,
+          "leido": 59
+        },
+        {
+          "campo": "votos_nulos",
+          "oficial": 8,
+          "leido": 3
+        },
+        {
+          "campo": "total_emitidos",
+          "oficial": 227,
+          "leido": 991
+        },
+        {
+          "campo": "total_electores",
+          "oficial": 300,
+          "leido": 306
+        },
+        {
+          "campo": "numero_mesa",
+          "oficial": 53542,
+          "leido": 43512
+        },
+        {
+          "campo": "total_ciudadanos",
+          "oficial": 227,
+          "leido": 24
+        }
+      ],
+      "mesa": "1c4cd64e-c39b-49a7-a96d-bd5c576f3271"
+    }
+  ],
+  "totales": {
+    "actas_evaluadas": 1,
+    "exactitud_campo_global": 0.5556,
+    "campos_evaluados": 45,
+    "campos_correctos": 25,
+    "cer_promedio_global": 0.3756,
+    "actas_perfectas": 0,
+    "regla_cero": true
+  }
+}

@@ -1,0 +1,242 @@
+{
+  "actas": [
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 42,
+      "exactitud_campo": 0.9767,
+      "cer_promedio": 0.0233,
+      "acta_perfecta": false,
+      "errores": [
+        {
+          "campo": "partido_32",
+          "oficial": 1,
+          "leido": 0
+        }
+      ],
+      "mesa": "001840"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 43,
+      "exactitud_campo": 1.0,
+      "cer_promedio": 0.0,
+      "acta_perfecta": true,
+      "errores": [],
+      "mesa": "003327"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 39,
+      "exactitud_campo": 0.907,
+      "cer_promedio": 0.093,
+      "acta_perfecta": false,
+      "errores": [
+        {
+          "campo": "partido_37",
+          "oficial": 1,
+          "leido": 2
+        },
+        {
+          "campo": "partido_02",
+          "oficial": 1,
+          "leido": 0
+        },
+        {
+          "campo": "partido_36",
+          "oficial": 0,
+          "leido": 1
+        },
+        {
+          "campo": "votos_nulos",
+          "oficial": 9,
+          "leido": 8
+        }
+      ],
+      "mesa": "003381"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 43,
+      "exactitud_campo": 1.0,
+      "cer_promedio": 0.0,
+      "acta_perfecta": true,
+      "errores": [],
+      "mesa": "004407"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 43,
+      "exactitud_campo": 1.0,
+      "cer_promedio": 0.0,
+      "acta_perfecta": true,
+      "errores": [],
+      "mesa": "004477"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 43,
+      "exactitud_campo": 1.0,
+      "cer_promedio": 0.0,
+      "acta_perfecta": true,
+      "errores": [],
+      "mesa": "009111"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 40,
+      "exactitud_campo": 0.9302,
+      "cer_promedio": 0.0698,
+      "acta_perfecta": false,
+      "errores": [
+        {
+          "campo": "partido_33",
+          "oficial": 9,
+          "leido": 19
+        },
+        {
+          "campo": "partido_38",
+          "oficial": 1,
+          "leido": 0
+        },
+        {
+          "campo": "partido_22",
+          "oficial": 1,
+          "leido": 0
+        }
+      ],
+      "mesa": "009626"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 43,
+      "exactitud_campo": 1.0,
+      "cer_promedio": 0.0,
+      "acta_perfecta": true,
+      "errores": [],
+      "mesa": "010888"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 43,
+      "exactitud_campo": 1.0,
+      "cer_promedio": 0.0,
+      "acta_perfecta": true,
+      "errores": [],
+      "mesa": "012852"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 40,
+      "exactitud_campo": 0.9302,
+      "cer_promedio": 0.0581,
+      "acta_perfecta": false,
+      "errores": [
+        {
+          "campo": "partido_33",
+          "oficial": 4,
+          "leido": 14
+        },
+        {
+          "campo": "partido_36",
+          "oficial": 0,
+          "leido": 1
+        },
+        {
+          "campo": "votos_nulos",
+          "oficial": 17,
+          "leido": 16
+        }
+      ],
+      "mesa": "012895"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 41,
+      "exactitud_campo": 0.9535,
+      "cer_promedio": 0.0349,
+      "acta_perfecta": false,
+      "errores": [
+        {
+          "campo": "partido_36",
+          "oficial": 0,
+          "leido": 1
+        },
+        {
+          "campo": "votos_nulos",
+          "oficial": 21,
+          "leido": 20
+        }
+      ],
+      "mesa": "013445"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 42,
+      "exactitud_campo": 0.9767,
+      "cer_promedio": 0.0233,
+      "acta_perfecta": false,
+      "errores": [
+        {
+          "campo": "partido_33",
+          "oficial": 5,
+          "leido": 0
+        }
+      ],
+      "mesa": "013453"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 43,
+      "exactitud_campo": 1.0,
+      "cer_promedio": 0.0,
+      "acta_perfecta": true,
+      "errores": [],
+      "mesa": "013912"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 42,
+      "exactitud_campo": 0.9767,
+      "cer_promedio": 0.0233,
+      "acta_perfecta": false,
+      "errores": [
+        {
+          "campo": "partido_01",
+          "oficial": 1,
+          "leido": 0
+        }
+      ],
+      "mesa": "014515"
+    },
+    {
+      "campos_evaluados": 43,
+      "campos_correctos": 41,
+      "exactitud_campo": 0.9535,
+      "cer_promedio": 0.0349,
+      "acta_perfecta": false,
+      "errores": [
+        {
+          "campo": "partido_36",
+          "oficial": 0,
+          "leido": 1
+        },
+        {
+          "campo": "votos_nulos",
+          "oficial": 17,
+          "leido": 16
+        }
+      ],
+      "mesa": "015264"
+    }
+  ],
+  "totales": {
+    "modelo": "gemini-flash-latest",
+    "shots": 2,
+    "actas_evaluadas": 15,
+    "exactitud_campo_global": 0.9736,
+    "campos_evaluados": 645,
+    "campos_correctos": 628,
+    "cer_promedio_global": 0.024,
+    "actas_perfectas": 7
+  }
+}

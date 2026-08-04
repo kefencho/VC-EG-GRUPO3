@@ -1,0 +1,23 @@
+{
+  "n_actas": 1,
+  "n_campos": 45,
+  "exactitud_campo": 0.5556,
+  "ic95_exactitud": [
+    0.5556,
+    0.5556
+  ],
+  "margen_error_pp": 0.0,
+  "cer_global": 0.3756,
+  "ic95_cer": [
+    0.3756,
+    0.3756
+  ],
+  "exactitud_por_acta": {
+    "media": 0.5556,
+    "sd": 0.0,
+    "min": 0.5556,
+    "max": 0.5556
+  },
+  "actas_perfectas": 0,
+  "n_bootstrap": 10000
+}
