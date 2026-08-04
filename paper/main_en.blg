@@ -1,0 +1,5 @@
+[0] Config.pm:328> INFO - This is Biber 2.21
+[0] Config.pm:331> INFO - Logfile is 'main_en.blg'
+[77] biber-MSWIN64:342> INFO - === 
+[364] Utils.pm:479> ERROR - Cannot find 'main_en.bcf'!
+[364] Biber.pm:137> INFO - ERRORS: 1

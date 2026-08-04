@@ -1,0 +1,402 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{cite}
+
+\begin{document}
+
+\title{\begin{tabular}{@{}m{2.3cm}@{\hspace{0.3cm}}m{\dimexpr\textwidth-3.0cm\relax}@{}}
+\includegraphics[width=2.1cm]{figuras/logo_uni.png} &
+\centering\arraybackslash Automatic Extraction of Electoral Results
+from Vote-Counting Records of the 2026 Peruvian General Elections
+\end{tabular}}
+
+\author{
+\IEEEauthorblockN{Josemanuel Rossy Ca\~nari Palante, Kenny Asto Hinostroza,
+Melissa Dessire Aylas Barranca, Carlos P\'erez P\'erez}
+\IEEEauthorblockA{Master's Program in Artificial Intelligence --- Computer Vision, Group 3\\
+National University of Engineering, Lima, Peru}
+}
+
+\maketitle
+
+\begin{abstract}
+In Peru, official electoral results are published through vote-counting records,
+many of which are scanned. This hinders the automatic processing of information
+at scale. We present a complete system that downloads records from the National
+Office of Electoral Processes (ONPE) portal, locates 46 fields in each document
+using a template and printed reference marks, and recognizes handwritten counts
+with optical character recognition (OCR) restricted to digits. The evaluation
+did not require manual labeling: the officially digitized and published ONPE
+results were used as the reference. The test set consisted of a random sample
+of 100 records from 23 departments. Twenty-four percent of the records were
+digital documents with an extractable text layer, achieving 95.1\% field-level
+accuracy. For the 76 scanned handwritten records (3,268 fields), the system
+achieved 59.6\% field-level accuracy and a Character Error Rate (CER) of
+0.401. On the same records, a multimodal Large Language Model (LLM) achieved
+48.4\%. The results show that a specialized, multi-stage system is a useful
+foundation for improving handwritten-digit recognition in electoral documents.
+\end{abstract}
+
+\begin{IEEEkeywords}
+document analysis, optical character recognition, handwritten digit recognition,
+electoral documents, template alignment
+\end{IEEEkeywords}
+
+\section{Introduction}
+Vote-counting records contain the official results for every polling station in
+Peru. Although ONPE publishes these documents digitally, much of the information
+is contained in scanned forms in which polling-station officials wrote the votes
+by hand. Reviewing these records manually is slow, can introduce errors, and is
+not feasible for the approximately 88,000 polling stations in a general election.
+This limits automated auditing and independent verification of the results.
+
+This work addresses the following question: \emph{how accurate can a traditional
+computer-vision system be when extracting results from Peruvian records selected
+at a national scale, and what does this imply for a real-world system?} To answer
+it, we built and evaluated a five-stage process: downloading, image preparation,
+field localization, digit recognition, and generation of structured output. The
+study used records from the first round of the 2026 General Elections. The main
+contributions are as follows:
+
+\begin{enumerate}
+\item \textbf{A reproducible evaluation without manual labeling.} The ONPE portal
+publishes both the image of each record and the officially digitized counts.
+These values were used as the reference for evaluating the system. Thus, each
+record provides approximately 43 already-verified field--value pairs. The test
+sample was randomly selected nationwide using a published seed.
+
+\item \textbf{A template aligned using printed form marks.} The record has a
+fixed layout and contains black squares along its edges. These marks make it
+possible to correct displacements and small distortions introduced during
+scanning. This correction improved accuracy by 8.7 percentage points compared
+with using fixed coordinates without alignment.
+
+\item \textbf{Identification of two record types.} Twenty-four percent of the
+sample consists of digitally generated records whose text layer can be directly
+extracted and achieves 95.1\% field-level accuracy. The remaining 76\% are
+scanned handwritten records that require image processing. Therefore, a
+real-world system must first identify the document type and apply the appropriate
+process.
+
+\item \textbf{A clear measure of general-purpose OCR performance.} On handwritten
+records, digit-restricted OCR achieved 59.6\% field-level accuracy. This result
+shows the limitation of using a general recognizer without training it on this
+document type and supports the need to train a specialized model.
+
+\item \textbf{A comparison with a multimodal language model.} Under the same
+records and evaluation conditions, a multimodal model given the complete page
+and two solved examples achieved 48.4\%, compared with 60.9\% for the multi-stage
+system. The multimodal model offers a useful initial approach, but it does not
+outperform the specialized method for reading handwritten digits.
+\end{enumerate}
+
+The code, field-level results, and sampling seed are publicly
+available.\footnote{\url{https://github.com/carlosperez100/onpe_actas}}
+
+\section{Related Work}
+\textbf{Object detection.} RT-DETR \cite{rtdetr} is a real-time object-detection
+model that, according to its authors, outperforms similarly sized YOLO models in
+accuracy and speed. In vote-counting records, where cells are close together and
+may be covered by stamps or signatures, learned detectors could be an alternative
+for locating fields. In this work, field localization is solved with a template
+aligned to the document. In the future, this template could also automatically
+generate labels to train detectors such as YOLOv11 or RT-DETR.
+
+\textbf{Text recognition.} TrOCR \cite{trocr} uses \emph{transformer} neural
+networks for optical character recognition. DTrOCR \cite{dtrocr} proposes a
+variant for printed, scene, and handwritten text recognition. These studies
+support the use of specialized models to improve handwritten-digit reading. In
+our case, it is important to prevent a model from changing a number into a
+seemingly more likely sequence, because each value represents an electoral count.
+
+\textbf{End-to-end document analysis.} OmniParser \cite{omniparser} integrates
+text localization, key information extraction, and table recognition. Donut
+\cite{donut}, by contrast, seeks to generate the document structure directly
+from the image. Results from these works show that documents with extensive
+tables can be difficult to process in a single step. We therefore retain a
+multi-stage process, as it enables clear inspection and measurement of the
+performance of each system component. End-to-end methods are considered an
+alternative for future work.
+
+The reviewed studies do not specifically evaluate handwritten digits in Peruvian
+electoral records containing stamps and signatures. This is the practical need
+addressed by this study.
+
+\section{Dataset}
+\subsection{Source and download}
+All documents come from the official ONPE results portal for the first round of
+the 2026 General Elections, held on April 12, 2026. The portal allows users to
+query the records for a polling station, their processing status, and associated
+files. Each vote-counting record is downloaded as a PDF from a temporary address
+provided by the portal. Downloads were performed at a moderate rate and logged
+in a file that allows them to be resumed after an interruption
+(\texttt{src/scraper/}).
+
+\subsection{Sample design}
+The study population contains approximately 88,064 polling-station codes,
+estimated through queries to the portal services. A simple random sample without
+replacement of 100 records was drawn using a published seed (2026). The sample
+covers 23 departments, identified using \emph{ubigeo} prefixes, where \emph{ubigeo}
+is the standard geographic code used in Peru. Lima accounted for 36\%, consistent
+with its greater weight in the electorate. This design avoids the bias of
+selecting polling stations with consecutive codes from a single district.
+
+\subsection{Record types}
+Reviewing the number of pages and the PDF text layer identified two document
+types: \textbf{76 handwritten records}, which are one-page scans with no
+extractable text, and \textbf{24 digital STAE records}, which have two pages, a
+digital signature, and counts written in a digital typeface. STAE stands for
+\emph{Soluci\'on Tecnol\'ogica de Apoyo al Escrutinio} (Technological Solution
+for Supporting Vote Counting), an ONPE tool that helps polling-station officials
+record and print the records. In this study, STAE records are the documents
+digitally generated using that tool.
+
+The proportion of digital records in the sample is 24\%, with a 95\% Wilson
+confidence interval from 16.7\% to 33.2\%. This result confirms that the
+population includes both document types, although the sample is not intended to
+estimate their exact proportion. Vision experiments were performed using the 76
+handwritten records; digital records were processed through direct extraction of
+the text layer (Sec.~\ref{sec:stae}).
+
+\subsection{Reference values}
+For each polling station in the sample, the counts officially digitized by ONPE
+were saved: votes by political organization, blank, null, and challenged votes,
+totals, and the number of voters. Positions 04 and 14 of the form correspond to
+withdrawn parties; they are therefore empty in the record and have no value in
+the official data. They were excluded from the evaluation to avoid counting
+matches between empty fields as correct predictions. In total, each record
+provides 43 evaluable fields, for a total of 3,268 fields in handwritten records.
+
+\section{Method}
+\subsection{Overview}
+The system comprises five stages: (1) downloading the PDF and official reference
+values; (2) image preparation; (3) region-of-interest localization; (4) value
+recognition; and (5) generation of a structured file for each record. Image
+preparation includes converting the PDF to an image at 300 pixels per inch,
+correcting skew, improving contrast, and reducing scan noise.
+
+\subsection{Field localization using a template and reference marks}
+\label{sec:registro}
+The record has a fixed format. Therefore, 46 regions were defined once in a
+reference record: 38 vote cells, four summary rows, and four header fields. The
+coordinates were stored as proportions of page width and height
+(Fig.~\ref{fig:overlay}).
+
+The direct use of fixed coordinates fails when the image contains black margins,
+displacements, or slight distortions introduced by the scanner. In some records,
+the content was shifted, causing a cell to be cropped over the wrong row. To
+solve this, the black squares printed along the form edges are used as reference
+marks. First, dark squares near the borders are detected. They are then compared
+with 15 known positions in the reference record to compute the most consistent
+displacement, ignoring missing marks or false detections. Finally, a simple
+geometric correction is applied to the page before cropping the fields.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figuras/plantilla_overlay.png}
+\caption{Reference record with the 46 template regions: 38 vote cells (blue),
+summary and header fields (red). Coordinates are applied after aligning the
+document using the reference marks.}
+\label{fig:overlay}
+\end{figure}
+
+\subsection{Recognition of handwritten counts}
+Each cell is processed with EasyOCR, configured to recognize digits only. Before
+recognition, improvements obtained from an error analysis of 10 pilot records
+are applied (Fig.~\ref{fig:limpieza}). First, an inner margin is removed to
+prevent the cell's printed borders from being interpreted as digits. The image
+is then converted to black and white using a threshold computed for each cell,
+so that handwritten ink is highlighted. Dotted separators printed at known cell
+positions and small scanning artifacts are also removed. In fields containing
+one box per digit, each box is read separately. If this process removes overly
+faint strokes, the system retries recognition using the original crop.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figuras/limpieza_celdas.png}
+\caption{Cleaning of problematic cells (top: original crop; bottom: processed
+crop). Borders and dotted separators that could be mistaken for digits are
+removed.}
+\label{fig:limpieza}
+\end{figure}
+
+\subsection{Rule for empty cells}
+Polling-station officials often leave blank the cell of a party that received no
+votes. In this form, an empty cell represents zero and does not necessarily
+indicate an OCR error. Therefore, when no value is recognized in a party cell or
+in challenged votes, the system assigns zero. This contribution of form-specific
+knowledge is reported separately to distinguish it from the image-recognition
+performance itself.
+
+\subsection{Processing of digital records}
+\label{sec:stae}
+For digital STAE records, the results are extracted directly from the PDF text
+layer. Each party name appears next to its count, and summary labels appear
+before their values. Extracted names are compared with the official names after
+normalizing capitalization, spaces, and accents. Thus, no image processing is
+required.
+
+\section{Experiments}
+\subsection{Metrics and statistical procedure}
+\textbf{Field-level accuracy} is the percentage of fields whose read value
+exactly matches the official value. \textbf{CER} (\emph{Character Error Rate})
+is the character-level error rate: it compares recognized digit strings with the
+correct strings. A lower CER indicates fewer errors.
+
+Fields from the same record may be related because they share the same scan
+quality and handwriting. For this reason, confidence intervals were calculated
+by resampling complete records, with 10,000 repetitions. Field-level results and
+per-record metrics are available in the project repository.
+
+\subsection{Incremental evaluation of improvements in the pilot (10 records)}
+In an initial analysis, consecutive polling stations from a single district were
+used. Therefore, it does not represent the country, but it does allow us to
+measure the contribution of each improvement added to recognition
+(Table~\ref{tab:pilot}).
+
+\begin{table}[t]
+\caption{Cumulative effect of improvements in the 10-record pilot.}
+\label{tab:pilot}
+\centering
+\begin{tabular}{lrr}
+\toprule
+Configuration & Accuracy (\%) & CER \\
+\midrule
+v1: digit OCR without cleaning & 43.95 & 0.524 \\
+v2: + ink, border, and box cleaning & 52.09 & 0.419 \\
+v3: + separator and artifact removal & 52.79 & 0.476 \\
+v4: + empty-cell = zero rule & 58.37 & 0.420 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{National evaluation (76 handwritten records)}
+Table~\ref{tab:national} presents the system results on the nationwide random
+sample. Alignment through reference marks proved essential. Without it, framing
+variations severely affected some records: the worst one achieved 14\% accuracy
+and a CER above 1. With alignment, accuracy increased by 8.7 percentage points,
+and the worst record rose from 14\% to 30\%. The empty-cell-equals-zero rule
+added 21.6 percentage points, as these cases were frequent in the national
+sample.
+
+\begin{table}[t]
+\caption{Results on the nationwide random sample of 76 handwritten records.}
+\label{tab:national}
+\centering
+\begin{tabular}{lrr}
+\toprule
+Configuration & Accuracy (\%) & CER \\
+\midrule
+Fixed template, OCR without cleaning & 26.81 & 0.724 \\
+Fixed template + zero rule & 50.86 & 0.482 \\
+Aligned template, OCR without cleaning & 38.00 & 0.617 \\
+\textbf{Aligned template + zero rule} & \textbf{59.58} & \textbf{0.401} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Main result.} The system achieved \textbf{59.58\% field-level
+accuracy}, with a 95\% confidence interval from 56.61\% to 62.48\%. CER was
+\textbf{0.401}, with a 95\% confidence interval from 0.360 to 0.444. Mean
+per-record accuracy was 59.6\%, with a standard deviation of 13.0 percentage
+points and a range from 30\% to 84\%. The remaining differences are mainly due
+to handwriting and scan quality rather than field localization.
+
+\textbf{Digital records.} Text-layer extraction from the 24 STAE records
+achieved \textbf{95.12\%} accuracy (955 of 1,004 fields). Remaining errors are
+related to matching party names, not to reading numbers. The 35.5 percentage
+point difference from handwritten records confirms the importance of identifying
+the document type before processing it.
+
+\subsection{Comparison with a multimodal language model}
+\label{sec:llm}
+As an alternative to the multi-stage process, we evaluated a large language
+model with the ability to analyze images and text (LLM). The model received the
+complete image of each record and two example records with their structured
+outputs. It had to return the counts without using a template, alignment, or
+independent OCR. Both methods were compared on the same 15 handwritten records.
+The model used was Gemini 2.5 Flash, accessed on its free tier in July 2026.
+The code is available in \texttt{src/recognition/llm\_ocr.py}.
+
+\begin{table}[t]
+\caption{Comparison between the multi-stage system and a multimodal model with
+two examples, on the same 15 handwritten records.}
+\label{tab:llm}
+\centering
+\begin{tabular}{lrr}
+\toprule
+Method & Accuracy (\%) & CER \\
+\midrule
+\textbf{Multi-stage system (aligned template + OCR)} & \textbf{60.93} & \textbf{0.395} \\
+Multimodal LLM with two examples & 48.37 & 0.591 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The multi-stage system outperformed the multimodal model by 12.6 percentage
+points. The model correctly identified the form's overall structure, but had
+greater difficulty reading handwritten digits in low-quality scans. On the two
+records with the worst results, it achieved 20.9\% and 23.3\%, whereas the
+multi-stage system achieved 34.9\% and 53.5\%, respectively. This is because
+the OCR receives an already isolated cell, whereas the multimodal model must
+interpret the entire page and its visual noise. The multimodal model may be
+useful for preparing an initial set of labels for a new format, but it does not
+replace a specialized recognizer for this task.
+
+\subsection{Error analysis}
+Errors were concentrated in four situations: thin digits that OCR does not
+detect; handwritten strokes that extend into areas where separators are removed;
+confusions between similar shapes, such as 8 and 18 or 7 and 9; and fields made
+up of several boxes. These are mainly recognition errors rather than field
+localization errors. Therefore, the next step is to train a recognizer specific
+to these digits and this form.
+
+\section{Conclusions and Future Work}
+The proposed system achieved 59.6\% field-level accuracy on handwritten records
+selected nationwide and 95.1\% on digital records. The evaluation was
+reproducible and did not require manual labeling, as it used the results
+officially digitized by ONPE as the reference.
+
+The study yields four main conclusions. First, before cropping fields with a
+template, the document must be aligned with its printed reference marks. Second,
+the rule that an empty cell equals zero must be distinguished from the strictly
+visual performance of OCR. Third, it is advisable to identify whether the
+document is handwritten or digital before selecting the processing method.
+Fourth, a general multimodal model requires less initial setup, but achieved
+12.6 percentage points less accuracy than the specialized system.
+
+As future work, we propose training a \emph{transformer}-based recognizer with
+the field--value pairs obtained from the records (approximately 43 per record
+and 43,000 from 1,000 records). We also propose training field detectors, such
+as YOLOv11 and RT-DETR \cite{rtdetr}, using labels automatically created with
+the aligned template; comparing the multi-stage system with end-to-end document
+analysis methods \cite{omniparser,donut}; and using the multimodal model to
+support the generation of initial labels that can subsequently be reviewed by a
+person.
+
+\begin{thebibliography}{9}
+\bibitem{rtdetr} Y.~Zhao, W.~Lv, S.~Xu, J.~Wei, G.~Wang, Q.~Dang, Y.~Liu,
+and J.~Chen, ``DETRs beat YOLOs on real-time object detection,'' in
+\emph{Proc. IEEE/CVF CVPR}, 2024, pp. 16965--16974.
+\bibitem{dtrocr} M.~Fujitake, ``DTrOCR: Decoder-only transformer for optical
+character recognition,'' in \emph{Proc. IEEE/CVF WACV}, 2024, pp. 8025--8035.
+\bibitem{omniparser} J.~Wan, S.~Song, W.~Yu, Y.~Liu, W.~Cheng, F.~Huang,
+X.~Bai, C.~Yao, and Z.~Yang, ``OmniParser: A unified framework for text
+spotting, key information extraction and table recognition,'' in \emph{Proc.
+IEEE/CVF CVPR}, 2024, pp. 15641--15653.
+\bibitem{trocr} M.~Li, T.~Lv, J.~Chen, L.~Cui, Y.~Lu, D.~Florencio, C.~Zhang,
+Z.~Li, and F.~Wei, ``TrOCR: Transformer-based optical character recognition
+with pre-trained models,'' in \emph{Proc. AAAI}, 2023, pp. 13094--13102.
+\bibitem{donut} G.~Kim, T.~Hong, M.~Yim, J.~Nam, J.~Park, J.~Yim, W.~Hwang,
+S.~Yun, D.~Han, and S.~Park, ``OCR-free document understanding transformer,''
+in \emph{Proc. ECCV}, 2022, pp. 498--517.
+\end{thebibliography}
+
+\end{document}
