@@ -8,19 +8,19 @@ env/
 .ipynb_checkpoints/
 
 # Datos pesados (no versionar el dataset; usar el scraper para regenerarlo)
-#data/raw_pdf/*
-#data/raw_img/*
-#data/processed/*
+data/raw_pdf/*
+data/raw_img/*
+data/processed/*
 data/detections/
-#data/crops/
-#data/ground_truth/
+data/crops/
+data/ground_truth/
 data/salida/
 data/salida_v2/
 data/salida_final/
 data/manifest.csv
 # muestra nacional: datos pesados fuera; se conservan los JSON de evidencia
-#data/corrida/
-#data/muestra/*
+data/corrida/
+data/muestra/*
 !data/muestra/muestra.json
 !data/muestra/tipos.json
 !data/muestra/electronicas.json
