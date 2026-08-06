@@ -25,8 +25,9 @@ análisis y auditoría.
 
 | Entregable | Dónde está | Cómo se regenera |
 |---|---|---|
-| **Paper** (inglés, formato WVC/IEEE, 5 págs, abstract 148 palabras) | [paper/main.pdf](paper/main.pdf) · versión en español: [paper/main_es.pdf](paper/main_es.pdf) | `cd paper && pdflatex main.tex` (dos pasadas) |
-| **Póster** (inglés, A0 vertical, una página) | PDF: [poster/poster.pdf](poster/poster.pdf) · web: **[kefencho.github.io/VC-EG-GRUPO3/poster/Poster_ONPE_2026_Grupo03.pdf](https://kefencho.github.io/VC-EG-GRUPO3/poster/Poster_ONPE_2026_Grupo03.pdf)** | `cd poster && pdflatex main.tex`; la versión pdf es [poster/Poster_ONPE_2026_Grupo03.pdf](poster/Poster_ONPE_2026_Grupo03.pdfs) |
+| **Paper** (inglés, formato WVC/IEEE, 5 págs, abstract 148 palabras) | [paper/main_en.pdf](paper/main_en.pdf) · versión en español: [paper/main_es.pdf](paper/main_es.pdf) | `cd paper && pdflatex main_en.tex` (dos pasadas) |
+| **Póster** (español, A0 vertical, una página) | PDF: [poster/Poster_ONPE_2026_Grupo03.pdf](poster/Poster_ONPE_2026_Grupo03.pdf) · web: **[kefencho.github.io/VC-EG-GRUPO3/poster/Poster_ONPE_2026_Grupo03.pdf](https://kefencho.github.io/VC-EG-GRUPO3/poster/Poster_ONPE_2026_Grupo03.pdf)** | `cd poster && pdflatex main.tex` (dos pasadas) |
+| **Presentación** (español, 17 láminas) | PPTX: [presentacion/Presentacion_Final_Grupo03.pptx](presentacion/Presentacion_Final_Grupo03.pptx) · PDF: [presentacion/Presentacion_Final_Grupo03.pdf](presentacion/Presentacion_Final_Grupo03.pdf) | editable en PowerPoint / Google Slides |
 | **Implementación** | este repositorio | ver *Reproducir los resultados del paper* |
 
 ---
@@ -150,7 +151,7 @@ onpe_actas/
 │   └── poster.html               # réplica web del póster A0
 ├── paper/                        # fuentes LaTeX y PDF del paper (EN y ES)
 ├── poster/                       # fuente LaTeX y PDF del póster A0
-├── presentacion/                 # generador del PPTX de la exposición
+├── presentacion/                 # PPTX y PDF de la exposición final
 ├── requirements.txt
 └── README.md
 ```
